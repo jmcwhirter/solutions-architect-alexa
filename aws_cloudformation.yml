@@ -1,0 +1,140 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: 'Creates Lambda function and IAM role necessary to back the AWS Answers Alexa skill'
+Parameters:
+  EndpointName:
+    Description: The name of the SageMaker endpoint.
+    Type: String
+Resources:
+  LambdaRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      RoleName: AnswersAlexaSkillRole
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          -
+            Effect: "Allow"
+            Principal:
+              Service:
+                - "lambda.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      Path: "/"
+      Policies:
+        -
+          PolicyName: "SageMakerInvoke"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              -
+                Effect: "Allow"
+                Action: "sagemaker:InvokeEndpoint"
+                Resource: "*"
+  LambdaFunction:
+    Type: "AWS::Lambda::Function"
+    Properties:
+      Handler: "lambda_function.lambda_handler"
+      Role:
+        Fn::GetAtt:
+          - "LambdaRole"
+          - "Arn"
+      Code:
+        ZipFile:
+          "from __future__ import print_function\n
+import boto3\n
+import os\n
+import sys\n
+import json\n
+reload(sys)\n
+sys.setdefaultencoding('utf8')\n
+runtime = boto3.client('sagemaker-runtime')\n
+def build_speechlet_response(title, output, reprompt_text, should_end_session):\n
+    return {\n
+        'outputSpeech': {\n
+            'type': 'PlainText',\n
+            'text': output\n
+        },\n
+        'card': {\n
+            'type': 'Simple',\n
+            'title': title,\n
+            'content': output\n
+        },\n
+        'reprompt': {\n
+            'outputSpeech': {\n
+                'type': 'PlainText',\n
+                'text': reprompt_text\n
+            }\n
+        },\n
+        'shouldEndSession': should_end_session\n
+    }\n
+def build_response(session_attributes, speechlet_response):\n
+    return {\n
+        'version': '1.0',\n
+        'sessionAttributes': session_attributes,\n
+        'response': speechlet_response\n
+    }\n
+def get_welcome_response():\n
+    session_attributes = {}\n
+    card_title = \"Welcome\"\n
+    speech_output = \"Welcome to the solutions architect skill. Feel free to ask me common questions about Sage Maker.\"\n
+    reprompt_text = \"Please ask me a question about Sage Maker such as, What types of notebooks are supported.\"\n
+    should_end_session = False\n
+    return build_response(session_attributes, build_speechlet_response(\n
+        card_title, speech_output, reprompt_text, should_end_session))\n
+def handle_session_end_request():\n
+    card_title = \"Session Ended\"\n
+    speech_output = \"Thank you for your questions. Have a nice day!\"\n
+    should_end_session = True\n
+    return build_response({}, build_speechlet_response(\n
+        card_title, speech_output, None, should_end_session))\n
+def ask_question(intent, session):\n
+    card_title = intent['name']\n
+    session_attributes = {}\n
+    should_end_session = True\n
+    if 'question' in intent['slots']:\n
+        question_payload={}\n
+        question_payload['input'] = intent['slots']['question']['value']\n
+        question_payload_json = json.dumps(question_payload)\n
+        output=runtime.invoke_endpoint(EndpointName = os.environ['endpointName'],Body=question_payload_json,ContentType='application/json',Accept=\"application/json\")\n
+        output = json.loads( output['Body'].read().decode('utf-8'))\n
+        speech_output = output['Response']['message']\n
+        reprompt_text = \"Feel free to ask me another question.\"\n
+    else:\n
+        speech_output = \"I'm not sure what your question is. Please try again.\"\n
+        reprompt_text = \"I'm not sure what your question is. Please try again.\"\n
+    return build_response(session_attributes, build_speechlet_response(\n
+        card_title, speech_output, reprompt_text, should_end_session))\n
+def on_session_started(session_started_request, session):\n
+def on_launch(launch_request, session):\n
+    return get_welcome_response()\n
+def on_intent(intent_request, session):\n
+    intent = intent_request['intent']\n
+    intent_name = intent_request['intent']['name']\n
+    if intent_name == \"AskQuestionIntent\":\n
+        return ask_question(intent, session)\n
+    elif intent_name == \"AMAZON.HelpIntent\":\n
+        return get_welcome_response()\n
+    elif intent_name == \"AMAZON.CancelIntent\" or intent_name == \"AMAZON.StopIntent\":\n
+        return handle_session_end_request()\n
+    else:\n
+        raise ValueError(\"Invalid intent\")\n
+def on_session_ended(session_ended_request, session):\n
+def lambda_handler(event, context):\n
+    if event['session']['new']:\n
+        on_session_started({'requestId': event['request']['requestId']},event['session'])\n
+    if event['request']['type'] == \"LaunchRequest\":\n
+        return on_launch(event['request'], event['session'])\n
+    elif event['request']['type'] == \"IntentRequest\":\n
+        return on_intent(event['request'], event['session'])\n
+    elif event['request']['type'] == \"SessionEndedRequest\":\n
+        return on_session_ended(event['request'], event['session'])"
+      Runtime: "python2.7"
+      Environment:
+        Variables :
+          endpointName: !Ref EndpointName
+      Timeout: 25
+Outputs:
+  FunctionARN:
+    Value: !GetAtt
+      - LambdaFunction
+      - Arn

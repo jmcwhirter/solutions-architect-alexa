@@ -1,0 +1,30 @@
+[
+  {
+    "ParameterKey": "ClientId",
+    "ParameterValue": "amzn1.application-oa2-client.a0821e57eb484dc08e74f860de5bd3aa"
+  },
+  {
+    "ParameterKey": "ClientSecret",
+    "ParameterValue": "2be86b5ebac4f33401a996e92d85a2f288261039803b4c4fc494101b50cfdbff"
+  },
+  {
+    "ParameterKey": "RefreshToken",
+    "ParameterValue": "Atzr|IwEBIOGre-xCOuEEbjsNCLKHR65THSXUYHRJSRXu27ynbQKuVR0SWv_Dqtg8Fp0NTAsv8HvRsigZvPDUFyCIcv11QN8xDqD4l69rpuFKizIHq6jtGreOf_8juJdwnKqYVNVC3IzHJOo1s9r4KE5axEAXVazGQwhBnpnJcgkuu_KiQytK21xCTkVQANIp1V-Ys4zvIST2Qhs1vnWIwsC_X8Qg-rwtZuKHRulfO0k8UZHs_7aBtegKA5nA9ush10u4ad--1phOhBjHYH3v0oWwnDcC5MnbwILDw-dz2M1HXF5REys2Ta3QuJ451_HIs--3ACHbsUfEiqvxh5o6BBH9MWF-w2ruoI_Rbqqj_lPM72t2xEC2mh31RTeerLm4UV33b4hXVj8mdm8hgGmY5sb-8qqD6CitUf8rsfNthBvM390oFRdsRiPq8ij-kvrJ9OLvQILfYO5ezH9l4A4m5M6MdEWi_Z_esSKQMSVnAV2AOH9jP2lFrJZpJPW2oFHOclVa4W5cTjVRNGPfeW47UIhoA4Joniq71rm3IWvf8I2xanUwo-RKFP0otELTikO0tMLzoAnLS1hJJh8idfW69C340OhCX4m5QwGurE6rkIck-WHz2RfIVnAwDjLgkukEFwv6A2ZtiOfkB4hvdMYLRdcQPx5vai39UO_1DCrdK0-0IgLygIbeTA"
+  },
+  {
+    "ParameterKey": "SkillBucket",
+    "ParameterValue": "mcwhirter-solutions-architect-alexa-2"
+  },
+  {
+    "ParameterKey": "SkillKey",
+    "ParameterValue": "alexa.zip"
+  },
+  {
+    "ParameterKey": "VendorId",
+    "ParameterValue": "M1N9GDS7GF6TUA"
+  },
+  {
+    "ParameterKey": "LambdaArn",
+    "ParameterValue": "arn:aws:lambda:us-east-1:221829338705:function:solutions-architect-lambda-function-LambdaFunction-1WWVBE70YY2WB"
+  }
+]

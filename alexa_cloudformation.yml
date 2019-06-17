@@ -1,0 +1,42 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: 'Creates Alexa Skill'
+Parameters:
+  ClientId:
+    Description: Client ID from Login with Amazon.
+    Type: String
+  ClientSecret:
+    Description: Client secret from Login with Amazon.
+    Type: String
+  RefreshToken:
+    Description: Refresh token from Login with Amazon.
+    Type: String
+  SkillBucket:
+    Description: The name of the Amazon S3 bucket where the .zip file that contains the skill package is stored.
+    Type: String
+  SkillKey:
+    Description: The location and name of the skill package .zip file.
+    Type: String
+  VendorId:
+    Description: The vendor ID associated with the Amazon developer account that will host the skill.
+    Type: String
+  LambdaArn:
+    Description: Lambda ARN
+    Type: String
+Resources:
+  AlexaSkill:
+    Type: Alexa::ASK::Skill
+    Properties:
+      AuthenticationConfiguration:
+        ClientId: !Ref ClientId
+        ClientSecret: !Ref ClientSecret
+        RefreshToken: !Ref RefreshToken
+      SkillPackage:
+        S3Bucket: !Ref SkillBucket
+        S3Key: !Ref SkillKey
+        # Overrides:
+        #   Manifest:
+        #     apis:
+        #       custom:
+        #         endpoint:
+        #           uri: !Ref LambdaArn
+      VendorId: !Ref VendorId

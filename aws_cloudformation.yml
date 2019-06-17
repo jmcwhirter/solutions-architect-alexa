@@ -4,6 +4,9 @@ Parameters:
   EndpointName:
     Description: The name of the SageMaker endpoint.
     Type: String
+  # EventSourceToken:
+  #   Description: For Alexa Smart Home functions, a token that must be supplied by the invoker.
+  #   Type: String
 Resources:
   LambdaRole:
     Type: "AWS::IAM::Role"
@@ -133,6 +136,16 @@ def lambda_handler(event, context):\n
         Variables :
           endpointName: !Ref EndpointName
       Timeout: 25
+  # AlexaSkillsKitPermission:
+  #   Type: AWS::Lambda::Permission
+  #   Properties:
+  #     Action: "lambda:InvokeFunction"
+  #     EventSourceToken: !Ref EventSourceToken
+  #     FunctionName:
+  #       Fn::GetAtt:
+  #         - "LambdaFunction"
+  #         - "Arn"
+  #     Principal: "alexa-appkit.amazon.com"
 Outputs:
   FunctionARN:
     Value: !GetAtt
